@@ -225,6 +225,7 @@ yarn prettier:check # check only
   - **Why is it needed?** — problem being solved
   - **How to test it?** — steps to reproduce and verify
   - **Related issue(s)/PR(s)** — links
+- When creating pull requests, always follow the template in [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md). Do not use your own format.
 
 ---
 

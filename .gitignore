@@ -155,7 +155,9 @@ tests/cli/.env
 # AI tools
 ############################
 CLAUDE.local.md
-.claude
+.claude/*
+!.claude/skills
+.claude/skills/local/
 .agents/local-skills
 .agents/local-state
 
