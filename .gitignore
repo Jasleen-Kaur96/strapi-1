@@ -155,11 +155,14 @@ tests/cli/.env
 # AI tools
 ############################
 CLAUDE.local.md
+# Track committed skills under .claude/skills/ and .agents/skills/, but reserve
+# `local/` as a private workspace for drafts and personal skills.
 .claude/*
 !.claude/skills
 .claude/skills/local/
-.agents/local-skills
-.agents/local-state
+.agents/*
+!.agents/skills
+.agents/skills/local/
 
 ############################
 # Strapi

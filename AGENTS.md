@@ -220,12 +220,16 @@ yarn prettier:check # check only
 - Branch from `develop`, target `develop` — never `main`.
 - Link the issue you're fixing in the description.
 - All tests must pass before merging.
-- PR description must use this template:
-  - **What does it do?** — technical changes made
-  - **Why is it needed?** — problem being solved
-  - **How to test it?** — steps to reproduce and verify
-  - **Related issue(s)/PR(s)** — links
-- When creating pull requests, always follow the template in [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md). Do not use your own format.
+- PR description must follow [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) — do not invent your own sections.
+
+---
+
+## Agent Skills & Workspace
+
+- **Canonical location** — agent skills live in `.agents/skills/<name>/SKILL.md`. `.claude/skills/<name>` is a symlink that re-exposes a skill for Claude Code; the symlink mode must be `120000` (committed symlink), not a regular file.
+- **`.agents/skills/local/`** and **`.claude/skills/local/`** — gitignored private workspaces. Put drafts and personal skills you don't want to commit here.
+- **`CLAUDE.local.md`** — gitignored personal notes.
+- **Adding a new committed skill** — drop it under `.agents/skills/<name>/` and (optionally) symlink it into `.claude/skills/<name>` with mode `120000`. No `.gitignore` edit needed. Anything outside `local/` is tracked by default, so keep drafts in `local/`.
 
 ---
 
