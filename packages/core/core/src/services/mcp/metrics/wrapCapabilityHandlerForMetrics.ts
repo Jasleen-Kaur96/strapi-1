@@ -8,7 +8,7 @@ const isCapabilityFailure = (result: unknown): boolean => {
     return false;
   }
 
-  return (result as { isError?: boolean }).isError === true;
+  return 'isError' in result && result.isError === true;
 };
 
 export const wrapCapabilityHandlerForMetrics = <
@@ -23,14 +23,12 @@ export const wrapCapabilityHandlerForMetrics = <
     const result = await handler(...args);
     const identity = normalizeMcpCapability(type, capabilityName);
 
-    if (identity === null) {
-      return result;
-    }
-
-    if (isCapabilityFailure(result)) {
-      sendDidNotExecuteMcpCapability(strapi, identity, 'execution_error');
-    } else {
-      sendDidExecuteMcpCapability(strapi, identity);
+    if (identity !== null) {
+      if (isCapabilityFailure(result)) {
+        sendDidNotExecuteMcpCapability(strapi, identity, 'execution_error');
+      } else {
+        sendDidExecuteMcpCapability(strapi, identity);
+      }
     }
 
     return result;
