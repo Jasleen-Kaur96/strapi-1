@@ -21,8 +21,7 @@ describe('wrapCapabilityHandlerForMetrics', () => {
 
     expect(sendDidExecuteMcpCapability).toHaveBeenCalledWith(strapi, {
       type: 'tool',
-      action: 'create',
-      source: 'content-manager',
+      name: 'create_article',
     });
     expect(sendDidNotExecuteMcpCapability).not.toHaveBeenCalled();
   });
@@ -39,20 +38,23 @@ describe('wrapCapabilityHandlerForMetrics', () => {
 
     expect(sendDidNotExecuteMcpCapability).toHaveBeenCalledWith(
       strapi,
-      { type: 'tool', action: 'create', source: 'content-manager' },
+      { type: 'tool', name: 'create_article' },
       'execution_error'
     );
     expect(sendDidExecuteMcpCapability).not.toHaveBeenCalled();
   });
 
-  test('does not record metrics for unknown capability names', async () => {
+  test('records metrics for unknown capability names', async () => {
     const strapi = { telemetry: { send: jest.fn() } } as any;
     const handler = jest.fn().mockResolvedValue({ content: [{ type: 'text', text: 'ok' }] });
 
     const wrapped = wrapCapabilityHandlerForMetrics(strapi, 'tool', 'unknown_tool', handler);
     await wrapped({ args: {} });
 
-    expect(sendDidExecuteMcpCapability).not.toHaveBeenCalled();
+    expect(sendDidExecuteMcpCapability).toHaveBeenCalledWith(strapi, {
+      type: 'tool',
+      name: 'unknown_tool',
+    });
     expect(sendDidNotExecuteMcpCapability).not.toHaveBeenCalled();
   });
 });

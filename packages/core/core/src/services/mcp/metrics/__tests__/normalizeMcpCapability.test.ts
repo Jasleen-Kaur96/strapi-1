@@ -1,20 +1,28 @@
 import { normalizeMcpCapability } from '../normalizeMcpCapability';
 
 describe('normalizeMcpCapability', () => {
-  it('maps tool names to coarse actions', () => {
+  it('returns raw capability identity for tools', () => {
     expect(normalizeMcpCapability('tool', 'create_article')).toEqual({
       type: 'tool',
-      action: 'create',
-      source: 'content-manager',
+      name: 'create_article',
     });
   });
 
-  it('returns null for unknown tool names', () => {
-    expect(normalizeMcpCapability('tool', 'custom_plugin_tool')).toBeNull();
+  it('returns raw capability identity for custom tools', () => {
+    expect(normalizeMcpCapability('tool', 'custom_plugin_tool')).toEqual({
+      type: 'tool',
+      name: 'custom_plugin_tool',
+    });
   });
 
-  it('returns null for prompts and resources until normalization rules exist', () => {
-    expect(normalizeMcpCapability('prompt', 'summarize_entry')).toBeNull();
-    expect(normalizeMcpCapability('resource', 'project://readme')).toBeNull();
+  it('tracks prompts and resources as raw identities', () => {
+    expect(normalizeMcpCapability('prompt', 'summarize_entry')).toEqual({
+      type: 'prompt',
+      name: 'summarize_entry',
+    });
+    expect(normalizeMcpCapability('resource', 'project://readme')).toEqual({
+      type: 'resource',
+      name: 'project://readme',
+    });
   });
 });

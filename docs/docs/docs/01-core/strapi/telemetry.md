@@ -269,18 +269,7 @@ There is **no batching API** — each event is one HTTP request. Strapi uses sev
 
 ### 1. Daily rate limiter (per event name)
 
-`packages/core/core/src/services/metrics/rate-limiter.ts` wraps the sender for events listed in `LIMITED_EVENTS`:
-
-```typescript
-const LIMITED_EVENTS = [
-  'didSaveMediaWithAlternativeText',
-  'didSaveMediaWithCaption',
-  'didDisableResponsiveDimensions',
-  'didEnableResponsiveDimensions',
-  'didInitializePluginUpload',
-  ...MCP_LIMITED_TELEMETRY_EVENTS, // MCP request lifecycle — see packages/core/core/src/services/mcp/metrics/metrics.ts
-];
-```
+`packages/core/core/src/services/metrics/rate-limiter.ts` wraps the sender for events listed in `LIMITED_EVENTS`.
 
 For listed events: **at most one send per event name per 24 hours** (in-memory cache, resets on rolling 24h window).
 

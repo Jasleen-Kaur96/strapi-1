@@ -76,36 +76,34 @@ describe('MCP metrics', () => {
     expect(classifyMcpRequestFailure('failure')).toBe('error');
   });
 
-  test('sendDidExecuteMcpCapability sends type, action, and source without capability names', () => {
+  test('sendDidExecuteMcpCapability sends type and capability name', () => {
     const send = jest.fn().mockReturnValue(Promise.resolve(true));
     const strapi = { telemetry: { send } } as any;
 
     sendDidExecuteMcpCapability(strapi, {
       type: 'tool',
-      action: 'create',
-      source: 'content-manager',
+      name: 'create_article',
     });
 
     expect(send).toHaveBeenCalledWith('didExecuteMcpCapability', {
-      eventProperties: { type: 'tool', action: 'create', source: 'content-manager' },
+      eventProperties: { type: 'tool', name: 'create_article' },
     });
   });
 
-  test('sendDidNotExecuteMcpCapability sends errorClass without capability names', () => {
+  test('sendDidNotExecuteMcpCapability sends errorClass and capability name', () => {
     const send = jest.fn().mockReturnValue(Promise.resolve(true));
     const strapi = { telemetry: { send } } as any;
 
     sendDidNotExecuteMcpCapability(
       strapi,
-      { type: 'tool', action: 'create', source: 'content-manager' },
+      { type: 'tool', name: 'create_article' },
       'execution_error'
     );
 
     expect(send).toHaveBeenCalledWith('didNotExecuteMcpCapability', {
       eventProperties: {
         type: 'tool',
-        action: 'create',
-        source: 'content-manager',
+        name: 'create_article',
         errorClass: 'execution_error',
       },
     });
@@ -116,13 +114,12 @@ describe('MCP metrics', () => {
     const strapi = { telemetry: { send } } as any;
     const identity = {
       type: 'tool' as const,
-      action: 'create' as const,
-      source: 'content-manager' as const,
+      name: 'create_article' as const,
     };
 
     sendDidExecuteMcpCapability(strapi, identity);
     sendDidExecuteMcpCapability(strapi, identity);
-    sendDidExecuteMcpCapability(strapi, { ...identity, action: 'update' });
+    sendDidExecuteMcpCapability(strapi, { ...identity, name: 'update_article' });
 
     expect(send).toHaveBeenCalledTimes(2);
   });
@@ -132,8 +129,7 @@ describe('MCP metrics', () => {
     const strapi = { telemetry: { send } } as any;
     const identity = {
       type: 'tool' as const,
-      action: 'create' as const,
-      source: 'content-manager' as const,
+      name: 'create_article' as const,
     };
 
     sendDidExecuteMcpCapability(strapi, identity);

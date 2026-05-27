@@ -3,12 +3,15 @@ import type { Core } from '@strapi/types';
 import type { McpCapabilityIdentity } from './normalizeMcpCapability';
 
 /** Rate-limited via core telemetry `LIMITED_EVENTS`. */
-export const MCP_LIMITED_TELEMETRY_EVENTS = [
-  'didStartMcpServer',
-  'didUseMcpServer',
-  'didNotAuthenticateMcpRequest',
-  'didNotHandleMcpRequest',
-] as const;
+export const MCP_LIMITED_TELEMETRY_EVENTS = {
+  didStartMcpServer: 'didStartMcpServer',
+  didUseMcpServer: 'didUseMcpServer',
+  didNotAuthenticateMcpRequest: 'didNotAuthenticateMcpRequest',
+  didNotHandleMcpRequest: 'didNotHandleMcpRequest',
+} as const;
+
+export type McpLimitedTelemetryEvent =
+  (typeof MCP_LIMITED_TELEMETRY_EVENTS)[keyof typeof MCP_LIMITED_TELEMETRY_EVENTS];
 
 export type McpAuthErrorClass = 'missing_token' | 'invalid_token';
 export type McpRequestErrorClass = 'timeout' | 'error';
@@ -28,7 +31,7 @@ const executedCapabilities = new Set<string>();
 const failedCapabilities = new Set<string>();
 
 const capabilityCacheKey = (identity: McpCapabilityIdentity, succeeded: boolean): string =>
-  `${succeeded ? 'execute' : 'notExecute'}:${identity.type}:${identity.action}:${identity.source}`;
+  `${succeeded ? 'execute' : 'notExecute'}:${identity.type}:${identity.name}`;
 
 /** Resets in-memory capability metrics state (unit tests only). */
 export const resetMcpMetricsStateForTests = (): void => {
@@ -72,7 +75,7 @@ export const sendDidStartMcpServer = (
   properties: McpStartTelemetryProperties
 ): void => {
   strapi.telemetry
-    .send('didStartMcpServer', {
+    .send(MCP_LIMITED_TELEMETRY_EVENTS.didStartMcpServer, {
       eventProperties: { path: properties.path },
       groupProperties: {
         numberOfTools: properties.numberOfTools,
@@ -84,7 +87,7 @@ export const sendDidStartMcpServer = (
 };
 
 export const sendDidUseMcpServer = (strapi: Core.Strapi): void => {
-  strapi.telemetry.send('didUseMcpServer').catch(() => {});
+  strapi.telemetry.send(MCP_LIMITED_TELEMETRY_EVENTS.didUseMcpServer).catch(() => {});
 };
 
 export const sendDidNotAuthenticateMcpRequest = (
@@ -92,7 +95,7 @@ export const sendDidNotAuthenticateMcpRequest = (
   errorClass: McpAuthErrorClass
 ): void => {
   strapi.telemetry
-    .send('didNotAuthenticateMcpRequest', {
+    .send(MCP_LIMITED_TELEMETRY_EVENTS.didNotAuthenticateMcpRequest, {
       eventProperties: { errorClass },
     })
     .catch(() => {});
@@ -103,7 +106,7 @@ export const sendDidNotHandleMcpRequest = (
   errorClass: McpRequestErrorClass
 ): void => {
   strapi.telemetry
-    .send('didNotHandleMcpRequest', {
+    .send(MCP_LIMITED_TELEMETRY_EVENTS.didNotHandleMcpRequest, {
       eventProperties: { errorClass },
     })
     .catch(() => {});
@@ -121,8 +124,7 @@ export const sendDidExecuteMcpCapability = (
     .send('didExecuteMcpCapability', {
       eventProperties: {
         type: identity.type,
-        action: identity.action,
-        source: identity.source,
+        name: identity.name,
       },
     })
     .catch(() => {});
@@ -141,8 +143,7 @@ export const sendDidNotExecuteMcpCapability = (
     .send('didNotExecuteMcpCapability', {
       eventProperties: {
         type: identity.type,
-        action: identity.action,
-        source: identity.source,
+        name: identity.name,
         errorClass,
       },
     })

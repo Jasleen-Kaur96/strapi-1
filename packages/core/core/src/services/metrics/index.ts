@@ -17,7 +17,7 @@ const LIMITED_EVENTS = [
   'didDisableResponsiveDimensions',
   'didEnableResponsiveDimensions',
   'didInitializePluginUpload',
-  ...MCP_LIMITED_TELEMETRY_EVENTS,
+  ...Object.values(MCP_LIMITED_TELEMETRY_EVENTS),
 ];
 
 const createTelemetryInstance = (strapi: Core.Strapi) => {

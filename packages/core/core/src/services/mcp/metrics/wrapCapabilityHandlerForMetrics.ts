@@ -23,12 +23,10 @@ export const wrapCapabilityHandlerForMetrics = <
     const result = await handler(...args);
     const identity = normalizeMcpCapability(type, capabilityName);
 
-    if (identity !== null) {
-      if (isCapabilityFailure(result)) {
-        sendDidNotExecuteMcpCapability(strapi, identity, 'execution_error');
-      } else {
-        sendDidExecuteMcpCapability(strapi, identity);
-      }
+    if (isCapabilityFailure(result)) {
+      sendDidNotExecuteMcpCapability(strapi, identity, 'execution_error');
+    } else {
+      sendDidExecuteMcpCapability(strapi, identity);
     }
 
     return result;
