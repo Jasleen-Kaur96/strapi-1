@@ -118,7 +118,13 @@ export class McpToolRegistry
                   safeHandler({ args, extra } as Parameters<typeof safeHandler>[0])
               : (extra: unknown) => safeHandler({ extra } as Parameters<typeof safeHandler>[0]);
 
-          const sdkHandler = wrapCapabilityHandlerForMetrics(strapi, 'tool', name, baseHandler);
+          const sdkHandler = wrapCapabilityHandlerForMetrics(
+            strapi,
+            'tool',
+            name,
+            definition.telemetry,
+            baseHandler
+          );
 
           return mcpServer.registerTool(
             name,

@@ -68,7 +68,13 @@ export class McpResourceRegistry
           };
         },
         registerWithSdk(safeHandler) {
-          const sdkHandler = wrapCapabilityHandlerForMetrics(strapi, 'resource', name, safeHandler);
+          const sdkHandler = wrapCapabilityHandlerForMetrics(
+            strapi,
+            'resource',
+            name,
+            definition.telemetry,
+            safeHandler
+          );
 
           return mcpServer.registerResource(name, uri, metadata, sdkHandler);
         },

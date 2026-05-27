@@ -12,16 +12,38 @@ describe('wrapCapabilityHandlerForMetrics', () => {
     jest.mocked(sendDidNotExecuteMcpCapability).mockClear();
   });
 
-  test('records metrics after a successful tool call', async () => {
+  test('records metrics with content-manager source when telemetry is provided', async () => {
     const strapi = { telemetry: { send: jest.fn() } } as any;
     const handler = jest.fn().mockResolvedValue({ content: [{ type: 'text', text: 'ok' }] });
 
-    const wrapped = wrapCapabilityHandlerForMetrics(strapi, 'tool', 'create_article', handler);
+    const wrapped = wrapCapabilityHandlerForMetrics(
+      strapi,
+      'tool',
+      'create_article',
+      { source: 'content-manager', name: 'create' },
+      handler
+    );
     await wrapped({ args: {} });
 
     expect(sendDidExecuteMcpCapability).toHaveBeenCalledWith(strapi, {
       type: 'tool',
-      name: 'create_article',
+      source: 'content-manager',
+      name: 'create',
+    });
+    expect(sendDidNotExecuteMcpCapability).not.toHaveBeenCalled();
+  });
+
+  test('falls back to unknown source and raw name when telemetry is undefined', async () => {
+    const strapi = { telemetry: { send: jest.fn() } } as any;
+    const handler = jest.fn().mockResolvedValue({ content: [{ type: 'text', text: 'ok' }] });
+
+    const wrapped = wrapCapabilityHandlerForMetrics(strapi, 'tool', 'log', undefined, handler);
+    await wrapped({ args: {} });
+
+    expect(sendDidExecuteMcpCapability).toHaveBeenCalledWith(strapi, {
+      type: 'tool',
+      source: 'unknown',
+      name: 'log',
     });
     expect(sendDidNotExecuteMcpCapability).not.toHaveBeenCalled();
   });
@@ -33,28 +55,40 @@ describe('wrapCapabilityHandlerForMetrics', () => {
       isError: true,
     });
 
-    const wrapped = wrapCapabilityHandlerForMetrics(strapi, 'tool', 'create_article', handler);
+    const wrapped = wrapCapabilityHandlerForMetrics(
+      strapi,
+      'tool',
+      'create_article',
+      { source: 'content-manager', name: 'create' },
+      handler
+    );
     await wrapped({ args: {} });
 
     expect(sendDidNotExecuteMcpCapability).toHaveBeenCalledWith(
       strapi,
-      { type: 'tool', name: 'create_article' },
+      { type: 'tool', source: 'content-manager', name: 'create' },
       'execution_error'
     );
     expect(sendDidExecuteMcpCapability).not.toHaveBeenCalled();
   });
 
-  test('records metrics for unknown capability names', async () => {
+  test('records plugin source when telemetry provides only a source string', async () => {
     const strapi = { telemetry: { send: jest.fn() } } as any;
     const handler = jest.fn().mockResolvedValue({ content: [{ type: 'text', text: 'ok' }] });
 
-    const wrapped = wrapCapabilityHandlerForMetrics(strapi, 'tool', 'unknown_tool', handler);
+    const wrapped = wrapCapabilityHandlerForMetrics(
+      strapi,
+      'tool',
+      'some_plugin_tool',
+      { source: 'my-plugin' },
+      handler
+    );
     await wrapped({ args: {} });
 
     expect(sendDidExecuteMcpCapability).toHaveBeenCalledWith(strapi, {
       type: 'tool',
-      name: 'unknown_tool',
+      source: 'my-plugin',
+      name: 'some_plugin_tool',
     });
-    expect(sendDidNotExecuteMcpCapability).not.toHaveBeenCalled();
   });
 });

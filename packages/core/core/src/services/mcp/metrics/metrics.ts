@@ -31,7 +31,7 @@ const executedCapabilities = new Set<string>();
 const failedCapabilities = new Set<string>();
 
 const capabilityCacheKey = (identity: McpCapabilityIdentity, succeeded: boolean): string =>
-  `${succeeded ? 'execute' : 'notExecute'}:${identity.type}:${identity.name}`;
+  `${succeeded ? 'execute' : 'notExecute'}:${identity.type}:${identity.source}:${identity.name}`;
 
 /** Resets in-memory capability metrics state (unit tests only). */
 export const resetMcpMetricsStateForTests = (): void => {
@@ -124,6 +124,7 @@ export const sendDidExecuteMcpCapability = (
     .send('didExecuteMcpCapability', {
       eventProperties: {
         type: identity.type,
+        source: identity.source,
         name: identity.name,
       },
     })
@@ -143,6 +144,7 @@ export const sendDidNotExecuteMcpCapability = (
     .send('didNotExecuteMcpCapability', {
       eventProperties: {
         type: identity.type,
+        source: identity.source,
         name: identity.name,
         errorClass,
       },

@@ -1,4 +1,4 @@
-import type { Core } from '@strapi/types';
+import type { Core, Modules } from '@strapi/types';
 
 import { normalizeMcpCapability, type McpCapabilityType } from './normalizeMcpCapability';
 import { sendDidExecuteMcpCapability, sendDidNotExecuteMcpCapability } from './metrics';
@@ -17,11 +17,12 @@ export const wrapCapabilityHandlerForMetrics = <
   strapi: Core.Strapi,
   type: McpCapabilityType,
   capabilityName: string,
+  telemetry: Modules.MCP.McpCapabilityTelemetry | undefined,
   handler: THandler
 ): THandler => {
   const wrapped = async (...args: Parameters<THandler>) => {
     const result = await handler(...args);
-    const identity = normalizeMcpCapability(type, capabilityName);
+    const identity = normalizeMcpCapability(type, capabilityName, telemetry);
 
     if (isCapabilityFailure(result)) {
       sendDidNotExecuteMcpCapability(strapi, identity, 'execution_error');

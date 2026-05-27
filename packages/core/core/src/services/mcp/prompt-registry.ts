@@ -66,7 +66,13 @@ export class McpPromptRegistry
           };
         },
         registerWithSdk(safeHandler) {
-          const sdkHandler = wrapCapabilityHandlerForMetrics(strapi, 'prompt', name, safeHandler);
+          const sdkHandler = wrapCapabilityHandlerForMetrics(
+            strapi,
+            'prompt',
+            name,
+            definition.telemetry,
+            safeHandler
+          );
 
           return mcpServer.registerPrompt(
             name,
